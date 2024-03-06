@@ -3,37 +3,28 @@ using UnityEngine;
 
 public class Mover : MonoBehaviour
 {
-    private float _speed;
-    private Transform _wayPoint;
+    [SerializeField] private float _speed;
+    [SerializeField] private Transform _wayPoint;
+
     private Transform[] _wayPoints;
-    private int _index;
+    private int _currentWaypoint = 0;
 
     private void Start()
     {
         _wayPoints = new Transform[_wayPoint.childCount];
 
-        for (int i = 0; i < _wayPoint.childCount; i++)
-            _wayPoints[i] = _wayPoint.GetChild(i).GetComponent<Transform>();
+        for (int i = 0; i < _wayPoints.Length; i++)
+            _wayPoints[i] = _wayPoint.GetChild(i);
+
+        _wayPoint = _wayPoints[0];
     }
 
     private void Update()
     {
-        var nextPoint = _wayPoints[_index];
-        transform.position = Vector3.MoveTowards(transform.position, nextPoint.position, _speed * Time.deltaTime);
+        if (transform.position == _wayPoints[_currentWaypoint].position)
+            _currentWaypoint = (_currentWaypoint + 1) % _wayPoints.Length;
+            _wayPoint= _wayPoints[_currentWaypoint];
 
-        if (transform.position == nextPoint.position) 
-            GetDirection();
-    }
-
-    public Vector3 GetDirection()
-    {
-        _index++;
-
-        if (_index == _wayPoints.Length)
-                _index = 0;
-
-        var direction = _wayPoints[_index].transform.position;
-        transform.forward = direction - transform.position;
-        return direction;
+        transform.position = Vector3.MoveTowards(transform.position, _wayPoints[_currentWaypoint].position, _speed * Time.deltaTime);
     }
 }

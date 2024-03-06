@@ -6,26 +6,27 @@ using UnityEngine;
 public class Shooting : MonoBehaviour
 {
     [SerializeField] private float _speed;
-    [SerializeField] private GameObject _prefab;
+    [SerializeField] private Bullet _prefab;
     [SerializeField] private float _timeWaitShooting;
 
     private Transform _objectToShoot;
-    private bool isWork = true;
+    private WaitForSeconds _wait;
 
     private void Start()
     {
+        _wait = new WaitForSeconds(_timeWaitShooting);
         StartCoroutine(Fire());
     }
 
     private IEnumerator Fire()
     {
-        while (isWork)
+        while (enabled)
         {
-            var direction = (_objectToShoot.position - transform.position).normalized;
-            var newBullet = Instantiate(_prefab, transform.position + direction, Quaternion.identity);
+            Vector3 direction = (_objectToShoot.position - transform.position).normalized;
+            Bullet newBullet = Instantiate(_prefab, transform.position + direction, Quaternion.identity);
             newBullet.GetComponent<Rigidbody>().transform.up = direction;
             newBullet.GetComponent<Rigidbody>().velocity = direction * _speed;
-            yield return new WaitForSeconds(_timeWaitShooting);
+            yield return _wait;
         }
     }
 }
